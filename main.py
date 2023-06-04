@@ -1,57 +1,102 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
+# from fastapi import FastAPI
 
-# HTTPRequestHandler class
-class MyHTTPRequestHandler(BaseHTTPRequestHandler):
-    
-    # GET
-    def do_GET(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
-        self.wfile.write(b'Hello, GET request!')
+# app = FastAPI()
 
-    # POST
-    def do_POST(self):
-        content_length = int(self.headers['Content-Length'])
-        post_data = self.rfile.read(content_length)
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
-        self.wfile.write(b'Hello, POST request! You sent: ' + post_data)
 
-    # PUT
-    def do_PUT(self):
-        content_length = int(self.headers['Content-Length'])
-        put_data = self.rfile.read(content_length)
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
-        self.wfile.write(b'Hello, PUT request! You sent: ' + put_data)
+# @app.get("/")
+# def get_root():
+#     return {"message": "Hello, GET request!"}
 
-    # PATCH
-    def do_PATCH(self):
-        content_length = int(self.headers['Content-Length'])
-        patch_data = self.rfile.read(content_length)
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
-        self.wfile.write(b'Hello, PATCH request! You sent: ' + patch_data)
 
-    # DELETE
-    def do_DELETE(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
-        self.wfile.write(b'Hello, DELETE request!')
+# @app.post("/")
+# def post_root(post_data: str):
+#     return {"message": f"Hello, POST request! You sent: {post_data}"}
 
-# main function
-def main():
-    host = 'localhost'
-    port = 8000
-    server_address = (host, port)
-    httpd = HTTPServer(server_address, MyHTTPRequestHandler)
-    print('Server running on {}:{}'.format(host, port))
-    httpd.serve_forever()
 
-if __name__ == '__main__':
-    main()
+# @app.put("/")
+# def put_root(put_data: str):
+#     return {"message": f"Hello, PUT request! You sent: {put_data}"}
+
+
+# @app.patch("/")
+# def patch_root(patch_data: str):
+#     return {"message": f"Hello, PATCH request! You sent: {patch_data}"}
+
+
+# @app.delete("/")
+# def delete_root():
+#     return {"message": "Hello, DELETE request!"}
+
+
+# if __name__ == "__main__":
+#     import uvicorn
+
+#     uvicorn.run(app, host="localhost", port=8000)
+from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import List
+from customer import Customer, sessionmaker
+
+# class PostData(BaseModel):
+#     post_data: str
+
+# class PutData(BaseModel):
+#     put_data: str
+
+# class PatchData(BaseModel):
+#     patch_data: str
+
+
+
+app = FastAPI()
+
+class CustomerSchema(BaseModel):
+    first_name: str
+    last_name: str
+    email: str
+    gender: str
+
+    class Config:
+        orm_mode=True
+
+@app.get("/")
+def get_root():
+    customer = session.query(Customer).all()
+    return {"message": "Hello, GET request!"}
+
+@app.get("/customer/{id}")
+def get_one_customer(id:int)->CustomerSchema:
+    single_customer = session.query(Customer).filter_by().first()
+    return single_student
+
+# @app.post("/students/")
+# def post_root(post_data: PostData):
+#     return {"message": f"Hello, POST request! You sent: {post_data.post_data}"}
+
+@app.post("/customer/")
+def add_data(customer: CustomerSchema)->CustomerSchema:
+    customer = Customer (customer)
+    session.add(customer)
+    session.commit()
+
+    return customer
+
+@app.put("/customer/")
+def put_root(put_data: PutData):
+    return {"message": f"Hello, PUT request! You sent: {put_data.put_data}"}
+
+
+@app.patch("/customer/")
+def patch_root(patch_data: PatchData):
+    return {"message": f"Hello, PATCH request! You sent: {patch_data.patch_data}"}
+
+
+@app.delete("/customer/{id}")
+def delete_root():
+    return {"message": "Hello, DELETE request!"}
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="localhost", port=8000)
