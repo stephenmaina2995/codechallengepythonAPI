@@ -34,7 +34,7 @@
 #     uvicorn.run(app, host="localhost", port=8000)
 from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 from customer import Customer, sessionmaker
 
 # class PostData(BaseModel):
@@ -51,10 +51,21 @@ from customer import Customer, sessionmaker
 app = FastAPI()
 
 class CustomerSchema(BaseModel):
+    customer_id:int
     first_name: str
     last_name: str
     email: str
     gender: str
+
+    class Config:
+        orm_mode=True
+
+class UpdateCustomerSchema(BaseModel):
+    customer_id: Optional[int] = None
+    first_name: Optional [str] = None
+    last_name: Optional [str] = None
+    email: Optional [str] = None
+    gender: Optional [str] = None
 
     class Config:
         orm_mode=True
@@ -75,7 +86,7 @@ def get_one_customer(id:int)->CustomerSchema:
 
 @app.post("/customer/")
 def add_data(customer: CustomerSchema)->CustomerSchema:
-    customer = Customer (customer)
+    customer = Customer (**dict(customer))
     session.add(customer)
     session.commit()
 
@@ -86,17 +97,21 @@ def put_root(put_data: PutData):
     return {"message": f"Hello, PUT request! You sent: {put_data.put_data}"}
 
 
-@app.patch("/customer/")
-def patch_root(patch_data: PatchData):
+@app.patch("/customer/update/{id}")
+def update_customer(id:int, payload:UpdateCustomerSchema )-> CustomerSchema:
+    customer = session.query(customer).filter_by(customer_id = id).first()
     return {"message": f"Hello, PATCH request! You sent: {patch_data.patch_data}"}
 
 
-@app.delete("/customer/{id}")
-def delete_root():
-    return {"message": "Hello, DELETE request!"}
+@app.delete("/customer/delete/{id}")
+def delete_customer(id : int)-> None:
+    customer = session.query(Customer).filter_by(customer-id).first().delete()
+    session.delete(customer)
+    session.commit()
+    return {"message": f"Customer, {id} deleted request"}
 
 
-if __name__ == "__main__":
-    import uvicorn
+# if __name__ == "__main__":
+#     import uvicorn
 
-    uvicorn.run(app, host="localhost", port=8000)
+#     uvicorn.run(app, host="localhost", port=8000)
