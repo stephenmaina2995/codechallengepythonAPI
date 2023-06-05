@@ -4,21 +4,21 @@ This is a simple API built with FastAPI for managing customer data. It provides 
 # Usage
 Once the API is running, you can access the endpoints using the following URLs:
 
-GET: http://localhost:8000/
+GET: http://127.0.0.1:8000/
 
 Returns a welcome message indicating a successful GET request.
-GET: http://localhost:8000/customer/{id}
+GET: http://127.0.0.1:8000/customer/{id}
 
 Retrieves the customer record with the specified id. Replace {id} with the actual customer ID.
-POST: http://localhost:8000/customer/
+POST: http://127.0.0.1:8000/customer/
 
 Creates a new customer record. Send a JSON payload with the following fields: first_name, last_name, email, and gender.
-PUT: http://localhost:8000/customer/
+PUT: http://127.0.0.1:8000/customer/
 
 Updates an existing customer record. Send a JSON payload with the updated fields: first_name, last_name, email, and gender.
-PATCH: http://localhost:8000/customer/
+PATCH: http://127.0.0.1:8000/customer/
 
 Partially updates an existing customer record. Send a JSON payload with the fields to be updated: first_name, last_name, email, and gender.
-DELETE: http://localhost:8000/customer/{id}
+DELETE: http://127.0.0.1:8000/customer/{id}
 
 Deletes the customer record with the specified id. Replace {id} with the actual customer ID.
